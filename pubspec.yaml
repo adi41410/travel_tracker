@@ -2,7 +2,7 @@ name: travel_tracker
 description: "A lightweight mobile app for travelers to record, organize, and view key trip details."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -34,45 +34,46 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  
+
   # Database
   sqflite: ^2.3.0
   path: ^1.8.3
-  
+
   # State management
   provider: ^6.1.1
-  
+
   # UI components
   intl: ^0.19.0
   image_picker: ^1.0.4
-  
+
   # Location services
   geolocator: ^10.1.0
   geocoding: ^2.1.1
-  
+
   # File handling and sharing
   path_provider: ^2.1.1
   share_plus: ^7.2.1
   pdf: ^3.10.7
-  
+
   # Firebase for cloud sync
   firebase_core: ^2.24.2
   firebase_auth: ^4.15.3
   cloud_firestore: ^4.13.6
   firebase_storage: ^11.5.6
-  
+
   # Connectivity
   connectivity_plus: ^5.0.2
-  
+  google_sign_in: ^6.2.1
+
   # UUID generation
   uuid: ^4.2.1
-  
+
   # Maps and location
   google_maps_flutter: ^2.5.0
-  
+
   # Local storage for memories and points
   shared_preferences: ^2.2.2
-  
+
   # Bottom navigation
   persistent_bottom_nav_bar: ^5.0.2
 
@@ -92,7 +93,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

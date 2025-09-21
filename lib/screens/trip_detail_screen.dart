@@ -7,7 +7,7 @@ import '../models/expense.dart';
 
 class TripDetailScreen extends StatefulWidget {
   final String tripId;
-  
+
   const TripDetailScreen({super.key, required this.tripId});
 
   @override
@@ -18,7 +18,6 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
-  final DateFormat _timeFormat = DateFormat('HH:mm');
 
   @override
   void initState() {
@@ -40,7 +39,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     return Consumer<TripProvider>(
       builder: (context, tripProvider, child) {
         final trip = tripProvider.selectedTrip;
-        
+
         if (trip == null) {
           return Scaffold(
             appBar: AppBar(title: const Text('Loading...')),
@@ -120,7 +119,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                       ),
                     ],
                   ),
-                  if (trip.description != null && trip.description!.isNotEmpty) ...[
+                  if (trip.description != null &&
+                      trip.description!.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
                       'Description',
@@ -134,7 +134,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Quick stats
           Row(
             children: [
@@ -146,9 +146,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                       children: [
                         Text(
                           '${tripProvider.activities.length}',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const Text('Activities'),
                       ],
@@ -165,9 +164,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                       children: [
                         Text(
                           '\$${tripProvider.getTotalExpenses().toStringAsFixed(0)}',
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: Theme.of(context).textTheme.headlineMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const Text('Total Spent'),
                       ],
@@ -192,9 +190,9 @@ class _TripDetailScreenState extends State<TripDetailScreen>
             const SizedBox(height: 16),
             Text(
               'No activities yet',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             const Text('Add your first activity to get started'),
@@ -245,9 +243,9 @@ class _TripDetailScreenState extends State<TripDetailScreen>
             const SizedBox(height: 16),
             Text(
               'No expenses yet',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 8),
             const Text('Track your spending to stay on budget'),
@@ -263,7 +261,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
     }
 
     final totalExpenses = tripProvider.getTotalExpenses();
-    
+
     return Column(
       children: [
         Container(
@@ -283,9 +281,9 @@ class _TripDetailScreenState extends State<TripDetailScreen>
               Text(
                 '\$${totalExpenses.toStringAsFixed(2)}',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ],
           ),
@@ -307,7 +305,8 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(_dateFormat.format(expense.date)),
-                      if (expense.description != null) Text(expense.description!),
+                      if (expense.description != null)
+                        Text(expense.description!),
                     ],
                   ),
                   trailing: Text(
@@ -386,12 +385,16 @@ class _TripDetailScreenState extends State<TripDetailScreen>
               ),
               TextField(
                 controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Description (Optional)'),
+                decoration: const InputDecoration(
+                  labelText: 'Description (Optional)',
+                ),
                 maxLines: 2,
               ),
               TextField(
                 controller: locationController,
-                decoration: const InputDecoration(labelText: 'Location (Optional)'),
+                decoration: const InputDecoration(
+                  labelText: 'Location (Optional)',
+                ),
               ),
             ],
           ),
@@ -406,7 +409,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
               if (titleController.text.trim().isNotEmpty) {
                 final authProvider = context.read<AuthProvider>();
                 final tripProvider = context.read<TripProvider>();
-                
+
                 await tripProvider.addActivity(
                   tripId: widget.tripId,
                   userId: authProvider.user!.id,
@@ -419,7 +422,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                       ? null
                       : locationController.text.trim(),
                 );
-                
+
                 if (mounted) Navigator.pop(context);
               }
             },
@@ -470,7 +473,9 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                 ),
                 TextField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description (Optional)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Description (Optional)',
+                  ),
                   maxLines: 2,
                 ),
               ],
@@ -489,7 +494,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                   if (amount != null && amount > 0) {
                     final authProvider = context.read<AuthProvider>();
                     final tripProvider = context.read<TripProvider>();
-                    
+
                     await tripProvider.addExpense(
                       tripId: widget.tripId,
                       userId: authProvider.user!.id,
@@ -501,7 +506,7 @@ class _TripDetailScreenState extends State<TripDetailScreen>
                           : descriptionController.text.trim(),
                       date: selectedDate,
                     );
-                    
+
                     if (mounted) Navigator.pop(context);
                   }
                 }

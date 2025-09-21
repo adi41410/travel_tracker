@@ -2,11 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:math' as math;
 import '../models/memory.dart';
-import '../services/database_service.dart';
 import '../services/memory_service.dart';
 
 class MemoryProvider with ChangeNotifier {
-  final DatabaseService _databaseService = DatabaseService();
   final MemoryService _memoryService = MemoryService();
   final Uuid _uuid = const Uuid();
 
@@ -110,25 +108,37 @@ class MemoryProvider with ChangeNotifier {
 
   List<Memory> getMemoriesByLocation(double lat, double lng, double radiusKm) {
     return _memories.where((memory) {
-      final distance = _calculateDistance(lat, lng, memory.latitude, memory.longitude);
+      final distance = _calculateDistance(
+        lat,
+        lng,
+        memory.latitude,
+        memory.longitude,
+      );
       return distance <= radiusKm;
     }).toList();
   }
 
-  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  double _calculateDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
     // Simple distance calculation using Haversine formula
     const double earthRadius = 6371; // Earth's radius in kilometers
-    
+
     final double dLat = _degreesToRadians(lat2 - lat1);
     final double dLon = _degreesToRadians(lon2 - lon1);
-    
-    final double a = 
+
+    final double a =
         math.sin(dLat / 2) * math.sin(dLat / 2) +
-        math.cos(_degreesToRadians(lat1)) * math.cos(_degreesToRadians(lat2)) * 
-        math.sin(dLon / 2) * math.sin(dLon / 2);
-    
+        math.cos(_degreesToRadians(lat1)) *
+            math.cos(_degreesToRadians(lat2)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+
     final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    
+
     return earthRadius * c;
   }
 

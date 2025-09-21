@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/points_provider.dart';
-import '../providers/auth_provider.dart';
 import '../models/points.dart';
 
 class PointsScreen extends StatefulWidget {
@@ -12,7 +11,8 @@ class PointsScreen extends StatefulWidget {
   State<PointsScreen> createState() => _PointsScreenState();
 }
 
-class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderStateMixin {
+class _PointsScreenState extends State<PointsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -49,9 +49,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
           }
 
           if (userPoints == null) {
-            return const Center(
-              child: Text('No points data available'),
-            );
+            return const Center(child: Text('No points data available'));
           }
 
           return TabBarView(
@@ -66,7 +64,10 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildOverviewTab(UserPoints userPoints, PointsProvider pointsProvider) {
+  Widget _buildOverviewTab(
+    UserPoints userPoints,
+    PointsProvider pointsProvider,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -82,13 +83,17 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
                 end: Alignment.bottomRight,
                 colors: [
                   pointsProvider.getLevelColor(userPoints.level),
-                  pointsProvider.getLevelColor(userPoints.level).withOpacity(0.7),
+                  pointsProvider
+                      .getLevelColor(userPoints.level)
+                      .withOpacity(0.7),
                 ],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: pointsProvider.getLevelColor(userPoints.level).withOpacity(0.3),
+                  color: pointsProvider
+                      .getLevelColor(userPoints.level)
+                      .withOpacity(0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -134,7 +139,9 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
                       child: Column(
                         children: [
                           Text(
-                            NumberFormat('#,###').format(userPoints.totalPoints),
+                            NumberFormat(
+                              '#,###',
+                            ).format(userPoints.totalPoints),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 28,
@@ -151,16 +158,14 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
                         ],
                       ),
                     ),
-                    Container(
-                      width: 1,
-                      height: 40,
-                      color: Colors.white30,
-                    ),
+                    Container(width: 1, height: 40, color: Colors.white30),
                     Expanded(
                       child: Column(
                         children: [
                           Text(
-                            NumberFormat('#,###').format(userPoints.pointsToNextLevel),
+                            NumberFormat(
+                              '#,###',
+                            ).format(userPoints.pointsToNextLevel),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 28,
@@ -186,10 +191,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
                   children: [
                     const Text(
                       'Progress to Next Level',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 12),
                     ),
                     const SizedBox(height: 8),
                     Container(
@@ -214,22 +216,22 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
               ],
             ),
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Points Breakdown
           Text(
             'Points Breakdown',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
-          
+
           _buildPointsBreakdown(userPoints),
-          
+
           const SizedBox(height: 24),
-          
+
           // Recent Activity
           Row(
             children: [
@@ -247,7 +249,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
             ],
           ),
           const SizedBox(height: 16),
-          
+
           _buildRecentActivity(userPoints.recentEntries.take(3).toList()),
         ],
       ),
@@ -256,7 +258,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
 
   Widget _buildPointsBreakdown(UserPoints userPoints) {
     final pointsByType = userPoints.pointsByType;
-    
+
     if (pointsByType.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(24),
@@ -267,10 +269,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
         child: Center(
           child: Text(
             'No points earned yet',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
           ),
         ),
       );
@@ -286,8 +285,9 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
         children: pointsByType.entries.map((entry) {
           final pointType = entry.key;
           final points = entry.value;
-          final config = PointsConfig.descriptions[pointType] ?? 'Points earned';
-          
+          final config =
+              PointsConfig.descriptions[pointType] ?? 'Points earned';
+
           return ListTile(
             leading: CircleAvatar(
               backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
@@ -312,7 +312,10 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildHistoryTab(UserPoints userPoints, PointsProvider pointsProvider) {
+  Widget _buildHistoryTab(
+    UserPoints userPoints,
+    PointsProvider pointsProvider,
+  ) {
     return FutureBuilder<List<PointsEntry>>(
       future: pointsProvider.getPointsHistory(userPoints.userId),
       builder: (context, snapshot) {
@@ -325,24 +328,20 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.history,
-                  size: 64,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.history, size: 64, color: Colors.grey[400]),
                 const SizedBox(height: 16),
                 Text(
                   'No points history yet',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Start exploring and earning points!',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[500],
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey[500]),
                 ),
               ],
             ),
@@ -373,10 +372,7 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
         child: Center(
           child: Text(
             'No recent activity',
-            style: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Colors.grey[600], fontSize: 16),
           ),
         ),
       );
@@ -389,14 +385,16 @@ class _PointsScreenState extends State<PointsScreen> with SingleTickerProviderSt
         border: Border.all(color: Colors.grey[200]!),
       ),
       child: Column(
-        children: recentEntries.map((entry) => _buildHistoryItem(entry)).toList(),
+        children: recentEntries
+            .map((entry) => _buildHistoryItem(entry))
+            .toList(),
       ),
     );
   }
 
   Widget _buildHistoryItem(PointsEntry entry) {
     final dateFormat = DateFormat('MMM dd, yyyy HH:mm');
-    
+
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),

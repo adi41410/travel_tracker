@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/trip_provider.dart';
 import '../providers/memory_provider.dart';
 import '../providers/points_provider.dart';
+import '../widgets/floating_chat_button.dart';
 import 'home_screen.dart';
 import 'memories_map_screen.dart';
 import 'points_screen.dart';
@@ -18,7 +19,7 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
-  
+
   late final List<Widget> _screens;
 
   @override
@@ -30,7 +31,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       const PointsScreen(),
       const ProfileScreen(),
     ];
-    
+
     // Load initial data
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadInitialData();
@@ -41,7 +42,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     final authProvider = context.read<AuthProvider>();
     if (authProvider.user != null) {
       final userId = authProvider.user!.id;
-      
+
       // Load all data in parallel
       await Future.wait([
         context.read<TripProvider>().loadTrips(userId),
@@ -54,7 +55,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: Stack(
+        children: [_screens[_currentIndex], const FloatingChatButton()],
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [

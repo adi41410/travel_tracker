@@ -144,15 +144,23 @@ class DatabaseService {
 
     // Create indexes for better performance
     await db.execute('CREATE INDEX idx_trips_userId ON trips (userId)');
-    await db.execute('CREATE INDEX idx_activities_tripId ON activities (tripId)');
+    await db.execute(
+      'CREATE INDEX idx_activities_tripId ON activities (tripId)',
+    );
     await db.execute('CREATE INDEX idx_activities_date ON activities (date)');
     await db.execute('CREATE INDEX idx_expenses_tripId ON expenses (tripId)');
     await db.execute('CREATE INDEX idx_expenses_date ON expenses (date)');
     await db.execute('CREATE INDEX idx_memories_userId ON memories (userId)');
     await db.execute('CREATE INDEX idx_memories_tripId ON memories (tripId)');
-    await db.execute('CREATE INDEX idx_memories_location ON memories (latitude, longitude)');
-    await db.execute('CREATE INDEX idx_points_userId ON points_entries (userId)');
-    await db.execute('CREATE INDEX idx_points_dateEarned ON points_entries (dateEarned)');
+    await db.execute(
+      'CREATE INDEX idx_memories_location ON memories (latitude, longitude)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_points_userId ON points_entries (userId)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_points_dateEarned ON points_entries (dateEarned)',
+    );
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -193,9 +201,15 @@ class DatabaseService {
       // Add new indexes
       await db.execute('CREATE INDEX idx_memories_userId ON memories (userId)');
       await db.execute('CREATE INDEX idx_memories_tripId ON memories (tripId)');
-      await db.execute('CREATE INDEX idx_memories_location ON memories (latitude, longitude)');
-      await db.execute('CREATE INDEX idx_points_userId ON points_entries (userId)');
-      await db.execute('CREATE INDEX idx_points_dateEarned ON points_entries (dateEarned)');
+      await db.execute(
+        'CREATE INDEX idx_memories_location ON memories (latitude, longitude)',
+      );
+      await db.execute(
+        'CREATE INDEX idx_points_userId ON points_entries (userId)',
+      );
+      await db.execute(
+        'CREATE INDEX idx_points_dateEarned ON points_entries (dateEarned)',
+      );
     }
   }
 
@@ -273,11 +287,7 @@ class DatabaseService {
 
   Future<int> deleteTrip(String id) async {
     final db = await database;
-    return await db.delete(
-      'trips',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('trips', where: 'id = ?', whereArgs: [id]);
   }
 
   // Activity operations
@@ -324,11 +334,7 @@ class DatabaseService {
 
   Future<int> deleteActivity(String id) async {
     final db = await database;
-    return await db.delete(
-      'activities',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('activities', where: 'id = ?', whereArgs: [id]);
   }
 
   // Expense operations
@@ -367,7 +373,7 @@ class DatabaseService {
       'SELECT SUM(amount) as total FROM expenses WHERE tripId = ?',
       [tripId],
     );
-    
+
     return result.first['total'] as double? ?? 0.0;
   }
 
@@ -383,11 +389,7 @@ class DatabaseService {
 
   Future<int> deleteExpense(String id) async {
     final db = await database;
-    return await db.delete(
-      'expenses',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete('expenses', where: 'id = ?', whereArgs: [id]);
   }
 
   // Sync operations
@@ -422,6 +424,11 @@ class DatabaseService {
     );
 
     return List.generate(maps.length, (i) => Expense.fromJson(maps[i]));
+  }
+
+  Future<int> deleteUser(String id) async {
+    final db = await database;
+    return await db.delete('users', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> close() async {

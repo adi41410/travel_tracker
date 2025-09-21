@@ -15,11 +15,8 @@ class _AuthScreenState extends State<AuthScreen> {
   final _homeCityController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
-  
-  AuthMode _authMode = AuthMode.email;
-  String _selectedCurrency = 'USD';
 
-  final List<String> _currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'CNY'];
+  AuthMode _authMode = AuthMode.google;
 
   @override
   void dispose() {
@@ -50,21 +47,21 @@ class _AuthScreenState extends State<AuthScreen> {
               Text(
                 'Travel Tracker',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 'Record, organize, and relive your adventures',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
-              
+
               // Auth mode selector
               Card(
                 child: Padding(
@@ -79,7 +76,22 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(height: 16),
                       _buildAuthModeSelector(),
                       const SizedBox(height: 24),
-                      
+
+                      // Instructions based on auth mode
+                      if (_authMode == AuthMode.google)
+                        Text(
+                          'Just tap the button below to sign in with your Google account. Name and home city are optional.',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        )
+                      else
+                        Text(
+                          'Please fill out the information below to get started.',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                      const SizedBox(height: 16),
+
                       Form(
                         key: _formKey,
                         child: Column(
@@ -93,14 +105,16 @@ class _AuthScreenState extends State<AuthScreen> {
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
-                                if (value?.isEmpty ?? true) {
+                                // Name is optional for Google Sign-In
+                                if (_authMode != AuthMode.google &&
+                                    (value?.isEmpty ?? true)) {
                                   return 'Please enter your name';
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 16),
-                            
+
                             // Home city field
                             TextFormField(
                               controller: _homeCityController,
@@ -110,35 +124,18 @@ class _AuthScreenState extends State<AuthScreen> {
                                 border: OutlineInputBorder(),
                               ),
                               validator: (value) {
-                                if (value?.isEmpty ?? true) {
+                                // Home city is optional for Google Sign-In
+                                if (_authMode != AuthMode.google &&
+                                    (value?.isEmpty ?? true)) {
                                   return 'Please enter your home city';
                                 }
                                 return null;
                               },
                             ),
                             const SizedBox(height: 16),
-                            
-                            // Email or Phone field based on mode
-                            if (_authMode == AuthMode.email)
-                              TextFormField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: const InputDecoration(
-                                  labelText: 'Email Address',
-                                  prefixIcon: Icon(Icons.email),
-                                  border: OutlineInputBorder(),
-                                ),
-                                validator: (value) {
-                                  if (value?.isEmpty ?? true) {
-                                    return 'Please enter your email';
-                                  }
-                                  if (!value!.contains('@')) {
-                                    return 'Please enter a valid email';
-                                  }
-                                  return null;
-                                },
-                              )
-                            else if (_authMode == AuthMode.phone)
+
+                            // Phone field only for phone mode
+                            if (_authMode == AuthMode.phone)
                               TextFormField(
                                 controller: _phoneController,
                                 keyboardType: TextInputType.phone,
@@ -154,36 +151,14 @@ class _AuthScreenState extends State<AuthScreen> {
                                   return null;
                                 },
                               ),
-                            
-                            if (_authMode != AuthMode.guest) const SizedBox(height: 16),
-                            
-                            // Currency selector
-                            DropdownButtonFormField<String>(
-                              value: _selectedCurrency,
-                              decoration: const InputDecoration(
-                                labelText: 'Preferred Currency',
-                                prefixIcon: Icon(Icons.attach_money),
-                                border: OutlineInputBorder(),
-                              ),
-                              items: _currencies.map((currency) {
-                                return DropdownMenuItem(
-                                  value: currency,
-                                  child: Text(currency),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    _selectedCurrency = value;
-                                  });
-                                }
-                              },
-                            ),
+
+                            if (_authMode != AuthMode.guest)
+                              const SizedBox(height: 16),
                           ],
                         ),
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Get started button
                       Consumer<AuthProvider>(
                         builder: (context, authProvider, child) {
@@ -191,14 +166,50 @@ class _AuthScreenState extends State<AuthScreen> {
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
-                              onPressed: authProvider.isLoading ? null : _handleGetStarted,
+                              onPressed: authProvider.isLoading
+                                  ? null
+                                  : _handleGetStarted,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).primaryColor,
-                                foregroundColor: Colors.white,
+                                backgroundColor: _authMode == AuthMode.google
+                                    ? Colors.white
+                                    : Theme.of(context).primaryColor,
+                                foregroundColor: _authMode == AuthMode.google
+                                    ? Colors.black87
+                                    : Colors.white,
+                                side: _authMode == AuthMode.google
+                                    ? const BorderSide(color: Colors.grey)
+                                    : null,
                               ),
                               child: authProvider.isLoading
-                                  ? const CircularProgressIndicator(color: Colors.white)
-                                  : Text(_getButtonText()),
+                                  ? CircularProgressIndicator(
+                                      color: _authMode == AuthMode.google
+                                          ? Colors.grey
+                                          : Colors.white,
+                                    )
+                                  : Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        if (_authMode == AuthMode.google) ...[
+                                          const Icon(
+                                            Icons.account_circle,
+                                            size: 24,
+                                          ),
+                                          const SizedBox(width: 12),
+                                        ] else if (_authMode ==
+                                            AuthMode.phone) ...[
+                                          const Icon(Icons.phone, size: 24),
+                                          const SizedBox(width: 12),
+                                        ] else if (_authMode ==
+                                            AuthMode.guest) ...[
+                                          const Icon(
+                                            Icons.person_outline,
+                                            size: 24,
+                                          ),
+                                          const SizedBox(width: 12),
+                                        ],
+                                        Text(_getButtonText()),
+                                      ],
+                                    ),
                             ),
                           );
                         },
@@ -207,7 +218,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
               ),
-              
+
               // Error display
               Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
@@ -266,8 +277,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _getAuthModeTitle(AuthMode mode) {
     switch (mode) {
-      case AuthMode.email:
-        return 'Sign up with Email';
+      case AuthMode.google:
+        return 'Sign in with Google';
       case AuthMode.phone:
         return 'Sign up with Phone';
       case AuthMode.guest:
@@ -277,8 +288,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _getAuthModeSubtitle(AuthMode mode) {
     switch (mode) {
-      case AuthMode.email:
-        return 'Create an account with your email address';
+      case AuthMode.google:
+        return 'Sign in quickly with your Google account';
       case AuthMode.phone:
         return 'Create an account with your phone number';
       case AuthMode.guest:
@@ -288,8 +299,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _getButtonText() {
     switch (_authMode) {
-      case AuthMode.email:
-        return 'Sign Up with Email';
+      case AuthMode.google:
+        return 'Sign in with Google';
       case AuthMode.phone:
         return 'Sign Up with Phone';
       case AuthMode.guest:
@@ -298,7 +309,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _handleGetStarted() async {
-    if (!_formKey.currentState!.validate()) {
+    // Only validate form for phone and guest modes
+    if (_authMode != AuthMode.google && !_formKey.currentState!.validate()) {
       return;
     }
 
@@ -306,27 +318,20 @@ class _AuthScreenState extends State<AuthScreen> {
     bool success = false;
 
     switch (_authMode) {
-      case AuthMode.email:
-        success = await authProvider.signUpWithEmail(
-          _emailController.text.trim(),
-          _nameController.text.trim(),
-          _homeCityController.text.trim(),
-          preferredCurrency: _selectedCurrency,
-        );
+      case AuthMode.google:
+        success = await authProvider.signInWithGoogle();
         break;
       case AuthMode.phone:
         success = await authProvider.signUpWithPhone(
           _phoneController.text.trim(),
           _nameController.text.trim(),
           _homeCityController.text.trim(),
-          preferredCurrency: _selectedCurrency,
         );
         break;
       case AuthMode.guest:
         success = await authProvider.continueAsGuest(
           _nameController.text.trim(),
           _homeCityController.text.trim(),
-          preferredCurrency: _selectedCurrency,
         );
         break;
     }
@@ -342,4 +347,4 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 }
 
-enum AuthMode { email, phone, guest }
+enum AuthMode { google, phone, guest }

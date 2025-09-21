@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import '../providers/memory_provider.dart';
-import '../providers/auth_provider.dart';
-import '../providers/points_provider.dart';
 import '../models/memory.dart';
 import 'add_memory_screen.dart';
 
@@ -17,7 +14,6 @@ class MemoriesMapScreen extends StatefulWidget {
 }
 
 class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
-  GoogleMapController? _controller;
   Position? _currentPosition;
   Set<Marker> _markers = {};
   bool _isLoading = true;
@@ -63,7 +59,7 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
   Future<void> _createMarkers() async {
     final memoryProvider = context.read<MemoryProvider>();
     final memories = memoryProvider.memories;
-    
+
     Set<Marker> markers = {};
 
     // Add current location marker
@@ -71,7 +67,10 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
       markers.add(
         Marker(
           markerId: const MarkerId('current_location'),
-          position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          position: LatLng(
+            _currentPosition!.latitude,
+            _currentPosition!.longitude,
+          ),
           infoWindow: const InfoWindow(
             title: 'Your Location',
             snippet: 'You are here',
@@ -136,9 +135,8 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                         Expanded(
                           child: Text(
                             memory.title,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
                         IconButton(
@@ -150,14 +148,17 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                        Icon(
+                          Icons.location_on,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             memory.locationName,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Colors.grey[600],
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(color: Colors.grey[600]),
                           ),
                         ),
                       ],
@@ -176,21 +177,27 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                       Wrap(
                         spacing: 8,
                         runSpacing: 4,
-                        children: memory.tags.map((tag) => Chip(
-                          label: Text(
-                            tag,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                        )).toList(),
+                        children: memory.tags
+                            .map(
+                              (tag) => Chip(
+                                label: Text(
+                                  tag,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).primaryColor.withOpacity(0.1),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
                     const SizedBox(height: 16),
                     Text(
                       'Added on ${memory.dateCreated.day}/${memory.dateCreated.month}/${memory.dateCreated.year}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[500],
-                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
                     ),
                   ],
                 ),
@@ -205,9 +212,7 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
   Future<void> _addMemory() async {
     if (_currentPosition == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to get current location'),
-        ),
+        const SnackBar(content: Text('Unable to get current location')),
       );
       return;
     }
@@ -274,7 +279,7 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                   children: [
                     GoogleMap(
                       onMapCreated: (GoogleMapController controller) {
-                        _controller = controller;
+                        // Controller created but not used
                       },
                       initialCameraPosition: CameraPosition(
                         target: _currentPosition != null
@@ -282,7 +287,10 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                                 _currentPosition!.latitude,
                                 _currentPosition!.longitude,
                               )
-                            : const LatLng(37.7749, -122.4194), // San Francisco default
+                            : const LatLng(
+                                37.7749,
+                                -122.4194,
+                              ), // San Francisco default
                         zoom: 14.0,
                       ),
                       markers: _markers,
@@ -319,17 +327,15 @@ class _MemoriesMapScreenState extends State<MemoriesMapScreen> {
                               const SizedBox(height: 12),
                               Text(
                                 'No memories yet!',
-                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Tap the + button to add your first travel memory',
                                 textAlign: TextAlign.center,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.grey[600],
-                                ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: Colors.grey[600]),
                               ),
                             ],
                           ),
